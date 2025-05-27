@@ -34,6 +34,9 @@ DOMAIN_STOPWATCH = "stopwatch"
 BLINDS = "blinds"
 DOMAIN_BLINDS = "cover"
 
+SPOTIFY_VOLUME = "spotify_volume"
+DOMAIN_MEDIA_PLAYER = "media_player"
+
 
 APP_SLUGS = [
     {
@@ -70,6 +73,12 @@ APP_SLUGS = [
         "slug": BLINDS,
         "friendly_name": "Blinds",
         "domain": DOMAIN_BLINDS,
+        "supported_features": 1,
+    },
+    {
+        "slug": SPOTIFY_VOLUME,
+        "friendly_name": "Spotify Volume",
+        "domain": DOMAIN_MEDIA_PLAYER,
         "supported_features": 1,
     },
 ]

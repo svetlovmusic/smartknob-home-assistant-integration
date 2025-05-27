@@ -20,6 +20,7 @@ from .services import (
     BlindsState,
     ClimateMode,
     ClimateState,
+    MediaState,
     LightState,
     Services,
     StateEncoder,
@@ -78,6 +79,16 @@ class MqttHandler:
                         mode or "off",
                         new_state.attributes.get("temperature") or 0,
                         new_state.attributes.get("current_temperature") or 0,
+                    )
+                elif app["app_slug"] == "spotify_volume":
+                    state = MediaState(
+                        {
+                            "volume": new_state.attributes.get("volume_level"),
+                            "mute": new_state.attributes.get("is_volume_muted"),
+                            "playing": new_state.state == "playing",
+                            "previous": False,
+                            "next": False,
+                        }
                     )
 
                 if state is not None:
@@ -257,6 +268,11 @@ class MqttHandler:
                                 state.get("target_temp"),
                                 state.get("current_temp"),
                             ),
+                        )
+                    elif app["app_slug"] == "spotify_volume":
+                        await self.services.async_handle_media(
+                            app["entity_id"],
+                            MediaState(state),
                         )
                     else:
                         _LOGGER.error("Not implemented command: ")
