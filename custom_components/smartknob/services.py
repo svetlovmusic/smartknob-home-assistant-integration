@@ -188,6 +188,55 @@ class Services:
             )
         )
 
+    async def async_handle_media(self, entity_id: str, state: MediaState):
+        """Handle media player entity."""
+        if state.volume is not None:
+            await self.hass.async_add_job(
+                self.hass.services.async_call(
+                    "media_player",
+                    "volume_set",
+                    {
+                        "entity_id": entity_id,
+                        "volume_level": state.volume,
+                    },
+                )
+            )
+        if state.mute is not None:
+            await self.hass.async_add_job(
+                self.hass.services.async_call(
+                    "media_player",
+                    "volume_mute",
+                    {
+                        "entity_id": entity_id,
+                        "is_volume_muted": state.mute,
+                    },
+                )
+            )
+        if state.playing is not None:
+            await self.hass.async_add_job(
+                self.hass.services.async_call(
+                    "media_player",
+                    "media_play" if state.playing else "media_pause",
+                    {"entity_id": entity_id},
+                )
+            )
+        if state.previous:
+            await self.hass.async_add_job(
+                self.hass.services.async_call(
+                    "media_player",
+                    "media_previous_track",
+                    {"entity_id": entity_id},
+                )
+            )
+        if state.next:
+            await self.hass.async_add_job(
+                self.hass.services.async_call(
+                    "media_player",
+                    "media_next_track",
+                    {"entity_id": entity_id},
+                )
+            )
+
 
 class StateEncoder(json.JSONEncoder):
     """Custom JSON encoder for the state objects."""
@@ -214,5 +263,13 @@ class StateEncoder(json.JSONEncoder):
                 "mode": o.mode,
                 "target_temp": o.target_temp,
                 "current_temp": o.current_temp,
+            }
+        if isinstance(o, MediaState):
+            return {
+                "volume": o.volume,
+                "mute": o.mute,
+                "playing": o.playing,
+                "previous": o.previous,
+                "next": o.next,
             }
         return super().default(o)
